@@ -137,6 +137,47 @@ var CruisePage = React.createClass({
       }
     });
 
+    var references;
+    if (cruise.hasOwnProperty("references")){
+
+      references = listOrFiller(cruise["references"].map(function(ref){
+
+      var href, text;
+      var organization;
+      var link = ref.value;
+      var value = ref.value;
+
+      if (ref.hasOwnProperty("properties")){
+        for (const prop in ref.properties){
+          if (prop == "href"){
+            href = ref.properties.href;
+          }
+          if (prop == "text"){
+            text = ref.properties.href;
+          }
+        }
+      }
+      if (ref.organization){
+        organization = <b>({ref.organization})</b>;
+      }
+      if (ref.type == "link" || href){
+        if (href){
+          link = href;
+        }
+        if (text){
+          value = text;
+        }
+        return (
+          <li>{ref.type}: {organization} <a href={link}>{value}</a></li>
+        )
+      } else {
+        return (
+          <li>{ref.type}: {organization} {value}</li>
+        );
+      }
+      }));
+    }
+
     return (
         <div>
          <Breadcrumb>
@@ -156,6 +197,7 @@ var CruisePage = React.createClass({
         <dt>Port In</dt><dd>{cruise.end_port}</dd>
         <dt>Ship</dt><dd>{cruise.ship}</dd>
         <dt>Institutions</dt><dd><ul className="list-unstyled">{institutions}</ul></dd>
+        <dt>References</dt><dd><ul className="list-unstyled">{references}</ul></dd>
         </dl>
         <h4>Dataset</h4>
         <ul>
