@@ -3,6 +3,10 @@ import { Router, Route, Link } from 'react-router'
 import {Breadcrumb} from 'react-bootstrap';
 
 import './bootstrap/css/bootstrap.min.css';
+import $ from 'jquery';
+window.jQuery = $;
+require('./bootstrap/js/collapse.js');
+require('./bootstrap/js/transition.js');
 
 const api_url = "https://cchdo.ucsd.edu/api/v1/pipe/site/microstructure.ucsd.edu";
 
@@ -192,7 +196,7 @@ var CruisePage = React.createClass({
         <dl className="dl-horizontal">
         <dt>Data Owner/PI</dt><dd><ul className="list-unstyled">{hrp_owners}</ul></dd>
         <dt>Chief Scientist(s)</dt><dd><ul className="list-unstyled">{chi_scis}</ul></dd>
-        <dt>Dates</dt><dd>{cruise.startDate} - {cruise.endDate}</dd>
+        <dt>Dates</dt><dd>{cruise.startDate}/{cruise.endDate}</dd>
         <dt>Port Out</dt><dd>{cruise.start_port}</dd>
         <dt>Port In</dt><dd>{cruise.end_port}</dd>
         <dt>Ship</dt><dd>{cruise.ship}</dd>
@@ -236,24 +240,95 @@ var CruiseList = React.createClass({
   },
   render: function() {
     console.log(this.props);
+
     var programs = this.state.cruises.map(function (program){
       return (
-          <li key={program.cruise.expocode}><Link to={`/cruise/${program.cruise.expocode}`}>{program.cruise.sites["microstructure.ucsd.edu"].name}</Link>
-          </li>
+        <tr>
+          <td key={program.cruise.expocode}><Link to={`/cruise/${program.cruise.expocode}`}>{program.cruise.sites["microstructure.ucsd.edu"].name}</Link>
+          </td>
+          <td key={program.cruise.start_port}>
+            {program.cruise.start_port}
+          </td>            
+          <td key={program.cruise.startDate}>
+            {program.cruise.startDate}
+          </td>
+          <td key={program.cruise.endDate}>
+            {program.cruise.endDate}
+          </td>
+        </tr>
           )
     });
+
     return (
       <div>
+        {/*
          <Breadcrumb>
            <Breadcrumb.Item active>
              Programs
            </Breadcrumb.Item>
          </Breadcrumb>
-        <ul>
-        {programs}
-        </ul>
+        */}
+
+
+        <div className="panel panel-default">
+          <div className="panel-heading">
+            <h3 className="panel-title">Welcome to the NSF-funded Microstructure Database</h3>
+          </div>
+
+          <div className="panel-body">
+            <p>This database provides a compilation of various datasets obtained from ocean microstructure profilers capable of measuring the smallest scales of oceanic turbulence. 
+
+              <a data-toggle="collapse" href="#introduction" aria-expanded="false" aria-controls="collapse">  more >>
+              </a>
+            </p>
+
+            <div className="collapse" id="introduction"> 
+              <p>Data from microstructure programs have been provided by the data owners (PIs) or has been digitized from historical papers. For the data given from PIs, data has been archived as CF-compliant NETCDF files with 1-m binned data, where possible, saving the variables: time, depth, pressure, temperature, salinity, latitude, longitude as well as the newly designated variables: epsilon (ocean turbulent kinetic energy dissipation rate in W/kg), and when available, chi-t (ocean dissipation rate of thermal variance from microtemperature in degrees C<sup>2</sup>/s), and chi-c (ocean dissipation rate of thermal variance from microconductivity in degrees C<sup>2</sup>/s). Database entries include the program names and program PIs as well cruise information (research ship, ports of entry and exit, cruise dates, and chief scientist). Relevant cruise reports, program related papers and other documents are also contained in the data archive.
+              </p>            
+              <p>Data digitized from PEQUOD, PATCHEX, and WESPAC historical documents include mean profiles of dissipation. 
+              </p>
+
+              {/* 
+              <p>Database entries have project specific DOIs which should be cited when the data is used in publication.
+              </p>
+              */}
+
+              <p>When available, additional supplementary data is provided such as shipboard ADCP and meteorological data. This data has been provided by the data owners (PIs) and has been included in the database as is without further quality checks by CCHDO.
+              </p>
+
+              <p>Newly obtained microstructure data can be uploaded to the microstructure database by sending 1-m binned data to the CCHDO group at <a href="ccdho.ucsd.edu/submit">cchdo.ucsd.edu/submit</a>.
+              </p>    
+
+              <p>Citation for data sets that had pressure and/or depth cacluated using the GSW Oceanographic Toolbox:  McDougall, T.J. and P.M. Barker, 2011: Getting started with TEOS-10 and the Gibbs Seawater (GSW) Oceanographic Toolbox, 28pp., SCOR/IAPSO WG127, ISBN 978-0-646-55621-5. 
+              </p>
+
+              <p>As part of the Climate Process Team on internal wave driven mixing and creation of this microstructure database, a corresponding github repository has been set up as a community supported and maintained set of best practice routines for calculating various mixing related variables.  <a href="https://github.com/OceanMixingCommunity/Standard-Mixing-Routines">https://github.com/OceanMixingCommunity/Standard-Mixing-Routines</a>
+              </p>
+            </div>
+
+          </div>
+
         </div>
-        )
+
+
+        <h2>Microstructure Programs</h2>
+
+        <table className="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Program Name</th>
+              <th>Port Out</th>              
+              <th>Start Date</th>
+              <th>End Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {programs}
+          </tbody>
+        </table>
+
+      </div>
+    )
   }
 });
 
