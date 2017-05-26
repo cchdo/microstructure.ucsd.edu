@@ -100,8 +100,9 @@ var IntroPane = React.createClass({
             </p>
 
             <p>
-              As part of the Climate Process Team on internal wave driven mixing and creation of this microstructure database, a corresponding github repository has been set up as a community supported and maintained set of best practice routines for calculating various mixing related variables.
-              <a href="https://github.com/OceanMixingCommunity/Standard-Mixing-Routines">https://github.com/OceanMixingCommunity/Standard-Mixing-Routines</a>
+              As part of the Climate Process Team on internal wave driven mixing and creation of this microstructure database, a corresponding GitHub repository has been set up as a community supported and maintained set of best practice routines for calculating various mixing related variables. <a href="https://github.com/OceanMixingCommunity/Standard-Mixing-Routines">https://github.com/OceanMixingCommunity/Standard-Mixing-Routines</a>
+            </p>
+            <p>Andy Pickering wrote a python notebook to show how to extract the microstructure database data. This notebook, Examine_mixing_data.ipynb, contains examples of reading and plotting netcdf files in the mixing database with python. It is part of the Ocean Mixing Community GitHub repository Standard-Mixing-Routines. <a href="https://github.com/OceanMixingCommunity/Standard-Mixing-Routines/blob/master/Examine_mixing_data.ipynb">Reading Mixing Database Files with Python</a>
             </p>
           </div>
         </Collapse>
