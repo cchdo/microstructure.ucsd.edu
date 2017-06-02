@@ -93,7 +93,7 @@ var IntroPane = React.createClass({
               This data has been provided by the data owners (PIs) and has been included in the database as is without further quality checks by CCHDO.
             </p>
             <p>
-              Newly obtained microstructure data can be uploaded to the microstructure database by sending 1-m binned data to the CCHDO group at <a href="ccdho.ucsd.edu/submit">cchdo.ucsd.edu/submit</a>.
+              Newly obtained microstructure data can be uploaded to the microstructure database by sending 1-m binned data to the CCHDO group at <a href="https://cchdo.ucsd.edu/submit">https://cchdo.ucsd.edu/submit</a>.
             </p>    
             <p>
               Citation for data sets that had pressure and/or depth cacluated using the GSW Oceanographic Toolbox:  McDougall, T.J. and P.M. Barker, 2011: Getting started with TEOS-10 and the Gibbs Seawater (GSW) Oceanographic Toolbox, 28pp., SCOR/IAPSO WG127, ISBN 978-0-646-55621-5. 
