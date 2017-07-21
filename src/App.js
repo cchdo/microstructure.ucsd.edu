@@ -131,6 +131,8 @@ var CruisePage = React.createClass({
     var cruise = getCruiseByExpocode(this.props.params.expocode, this.state.cruises);
     var files = getCruiseFilesByExpocode(this.props.params.expocode, this.state.cruises);
 
+    var expocode_link = <a href={"https://cchdo.ucsd.edu/cruise/" + cruise.expocode}>{cruise.expocode}</a>;
+    
     var institutions = [];
     var hrp_owners= listOrFiller(cruise["participants"].map(function(person){
       if (person.role === "Microstructure PI"){
@@ -251,6 +253,7 @@ var CruisePage = React.createClass({
         <dt>Ship</dt><dd>{cruise.ship}</dd>
         <dt>Institutions</dt><dd><ul className="list-unstyled">{institutions}</ul></dd>
         <dt>References</dt><dd><ul className="list-unstyled">{references}</ul></dd>
+        <dt>Expocode</dt><dd>{expocode_link}</dd>
         </dl>
         <h4>Dataset</h4>
         <ul>
