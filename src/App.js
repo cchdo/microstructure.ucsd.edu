@@ -378,7 +378,7 @@ class App extends Component {
   render() {
     var expocode = parseHash(window.location.hash);
     return (
-      <Microstructure source="https://cchdo.ucsd.edu/api/v1/pipe/site/microstructure.ucsd.edu" expocode={expocode}/>
+      <Microstructure source={api_url} expocode={expocode}/>
     )
   }
 }
