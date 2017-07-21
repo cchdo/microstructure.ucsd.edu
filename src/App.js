@@ -5,6 +5,7 @@ import {Breadcrumb, Panel, Collapse} from 'react-bootstrap';
 import './bootstrap/css/bootstrap.min.css';
 
 const api_url = "https://cchdo.ucsd.edu/api/v1/pipe/site/microstructure.ucsd.edu";
+const cchdo_url = "https://cchdo.ucsd.edu";
 
 var cruises = [];
 const cruisesEvent = new Event("cruises");
@@ -93,7 +94,7 @@ var IntroPane = React.createClass({
               This data has been provided by the data owners (PIs) and has been included in the database as is without further quality checks by CCHDO.
             </p>
             <p>
-              Newly obtained microstructure data can be uploaded to the microstructure database by sending 1-m binned data to the CCHDO group at <a href="https://cchdo.ucsd.edu/submit">https://cchdo.ucsd.edu/submit</a>.
+              Newly obtained microstructure data can be uploaded to the microstructure database by sending 1-m binned data to the CCHDO group at <a href={cchdo_url + "/submit"}>{cchdo_url + "/submit"}</a>.
             </p>    
             <p>
               Citation for data sets that had pressure and/or depth cacluated using the GSW Oceanographic Toolbox:  McDougall, T.J. and P.M. Barker, 2011: Getting started with TEOS-10 and the Gibbs Seawater (GSW) Oceanographic Toolbox, 28pp., SCOR/IAPSO WG127, ISBN 978-0-646-55621-5. 
@@ -131,7 +132,7 @@ var CruisePage = React.createClass({
     var cruise = getCruiseByExpocode(this.props.params.expocode, this.state.cruises);
     var files = getCruiseFilesByExpocode(this.props.params.expocode, this.state.cruises);
 
-    var expocode_link = <a href={"https://cchdo.ucsd.edu/cruise/" + cruise.expocode}>{cruise.expocode}</a>;
+    var expocode_link = <a href={cchdo_url + "/cruise/" + cruise.expocode}>{cruise.expocode}</a>;
     
     var institutions = [];
     var hrp_owners= listOrFiller(cruise["participants"].map(function(person){
@@ -166,28 +167,28 @@ var CruisePage = React.createClass({
     var dataset = files.map(function(file){
       if (file.role === 'dataset' && file.data_type === 'hrp'){
       return (
-          <li key={file.file_hash}><a href={"http://cchdo.ucsd.edu" + file.file_path}>{file.file_name}</a></li>
+          <li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>
           )
       }
     });
     var reports = files.map(function(file){
       if (file.role === 'dataset' && file.data_type === 'documentation'){
       return (
-          <li key={file.file_hash}><a href={"http://cchdo.ucsd.edu" + file.file_path}>{file.file_name}</a></li>
+          <li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>
           )
       }
     });
     var intermediate = files.map(function(file){
       if (file.role === 'intermediate' && file.data_type === 'hrp'){
       return (
-          <li key={file.file_hash}><a href={"http://cchdo.ucsd.edu" + file.file_path}>{file.file_name}</a></li>
+          <li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>
           )
       }
     });
     var raw = files.map(function(file){
       if (file.role === 'raw' && file.data_type === 'hrp'){
       return (
-          <li key={file.file_hash}><a href={"http://cchdo.ucsd.edu" + file.file_path}>{file.file_name}</a></li>
+          <li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>
           )
       }
     });
