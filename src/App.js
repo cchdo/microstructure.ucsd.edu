@@ -256,7 +256,7 @@ var CruisePage = React.createClass({
         <dt>References</dt><dd><ul className="list-unstyled">{references}</ul></dd>
         <dt>Expocode</dt><dd>{expocode_link}</dd>
         </dl>
-        <h4>Dataset</h4>
+        <h4>Microstructure NetCDF Dataset</h4>
         <ul>
           {dataset}
         </ul>
