@@ -260,6 +260,8 @@ var CruisePage = React.createClass({
         <ul>
           {reports}
         </ul>
+
+        {/*
         <h4>Data As Received</h4>
         <h5>Intermediate</h5>
         <ul>
@@ -269,6 +271,8 @@ var CruisePage = React.createClass({
         <ul>
           {raw}
         </ul>
+        */}
+
         </div>
         )
   }
