@@ -185,6 +185,7 @@ var CruisePage = React.createClass({
           )
       }
     });
+
     var raw = files.map(function(file){
       if (file.role === 'raw' && file.data_type === 'hrp'){
       return (
@@ -192,6 +193,44 @@ var CruisePage = React.createClass({
           )
       }
     });
+
+    var intermediate_files = function(intermediate) {
+      if (intermediate) {
+        return (
+          <div>
+          <h5>Intermediate</h5>
+          <ul>
+            {intermediate}
+          </ul>
+          </div>
+        )
+      }
+    }
+
+    var raw_files = function(raw) {
+      if (raw) {
+        return (
+          <div>
+          <h5>Raw</h5>
+          <ul>
+            {raw}
+          </ul>
+          </div>
+        )
+      }
+    }
+
+    var supplemental_files = function(raw, intermediate) {
+      if (raw | intermediate) {
+        return (
+          <div>
+          <h4>Data As Received</h4>
+          {intermediate_files}
+          {raw_files}
+          </div>
+        )
+      }
+    }
 
     var references;
     if (cruise.hasOwnProperty("references")){
@@ -246,6 +285,7 @@ var CruisePage = React.createClass({
          </Breadcrumb>
 
         <dl className="dl-horizontal">
+        <dt>Expocode</dt><dd>{expocode_link}</dd>
         <dt>Data Owner/PI</dt><dd><ul className="list-unstyled">{hrp_owners}</ul></dd>
         <dt>Chief Scientist(s)</dt><dd><ul className="list-unstyled">{chi_scis}</ul></dd>
         <dt>Dates</dt><dd>{cruise.startDate}/{cruise.endDate}</dd>
@@ -253,8 +293,7 @@ var CruisePage = React.createClass({
         <dt>Port In</dt><dd>{cruise.end_port}</dd>
         <dt>Ship</dt><dd>{cruise.ship}</dd>
         <dt>Institutions</dt><dd><ul className="list-unstyled">{institutions}</ul></dd>
-        <dt>References</dt><dd><ul className="list-unstyled">{references}</ul></dd>
-        <dt>Expocode</dt><dd>{expocode_link}</dd>
+        <dt>References</dt><dd><ul className="list-unstyled">{references}</ul></dd>        
         </dl>
         <h4>Microstructure NetCDF Dataset</h4>
         <ul>
@@ -265,18 +304,10 @@ var CruisePage = React.createClass({
           {reports}
         </ul>
 
-        {/*
-        <h4>Data As Received</h4>
-        <h5>Intermediate</h5>
-        <ul>
-          {intermediate}
-        </ul>
-        <h5>Raw</h5>
-        <ul>
-          {raw}
-        </ul>
-        */}
 
+        {supplemental_files}
+
+        
         </div>
         )
   }
