@@ -221,7 +221,7 @@ var CruisePage = React.createClass({
     }
 
     var supplemental_files = function(raw, intermediate) {
-      if (raw | intermediate) {
+      if (raw || intermediate) {
         return (
           <div>
           <h4>Data As Received</h4>
