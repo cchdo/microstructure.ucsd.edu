@@ -5,6 +5,7 @@ import {Breadcrumb, Panel, Collapse} from 'react-bootstrap';
 import './bootstrap/css/bootstrap.min.css';
 
 const api_url = "https://cchdo.ucsd.edu/api/v1/pipe/site/microstructure.ucsd.edu";
+const cchdo_url = "https://cchdo.ucsd.edu";
 
 var cruises = [];
 const cruisesEvent = new Event("cruises");
@@ -93,7 +94,7 @@ var IntroPane = React.createClass({
               This data has been provided by the data owners (PIs) and has been included in the database as is without further quality checks by CCHDO.
             </p>
             <p>
-              Newly obtained microstructure data can be uploaded to the microstructure database by sending 1-m binned data to the CCHDO group at <a href="https://cchdo.ucsd.edu/submit">https://cchdo.ucsd.edu/submit</a>.
+              Newly obtained microstructure data can be uploaded to the microstructure database by sending 1-m binned data to the CCHDO group at <a href={cchdo_url + "/submit"}>{cchdo_url + "/submit"}</a>.
             </p>    
             <p>
               Citation for data sets that had pressure and/or depth cacluated using the GSW Oceanographic Toolbox:  McDougall, T.J. and P.M. Barker, 2011: Getting started with TEOS-10 and the Gibbs Seawater (GSW) Oceanographic Toolbox, 28pp., SCOR/IAPSO WG127, ISBN 978-0-646-55621-5. 
@@ -131,6 +132,8 @@ var CruisePage = React.createClass({
     var cruise = getCruiseByExpocode(this.props.params.expocode, this.state.cruises);
     var files = getCruiseFilesByExpocode(this.props.params.expocode, this.state.cruises);
 
+    var expocode_link = <a href={cchdo_url + "/cruise/" + cruise.expocode}>{cruise.expocode}</a>;
+    
     var institutions = [];
     var hrp_owners= listOrFiller(cruise["participants"].map(function(person){
       if (person.role === "Microstructure PI"){
@@ -164,31 +167,70 @@ var CruisePage = React.createClass({
     var dataset = files.map(function(file){
       if (file.role === 'dataset' && file.data_type === 'hrp'){
       return (
-          <li key={file.file_hash}><a href={"http://cchdo.ucsd.edu" + file.file_path}>{file.file_name}</a></li>
+          <li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>
           )
       }
     });
     var reports = files.map(function(file){
       if (file.role === 'dataset' && file.data_type === 'documentation'){
       return (
-          <li key={file.file_hash}><a href={"http://cchdo.ucsd.edu" + file.file_path}>{file.file_name}</a></li>
+          <li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>
           )
       }
     });
     var intermediate = files.map(function(file){
       if (file.role === 'intermediate' && file.data_type === 'hrp'){
       return (
-          <li key={file.file_hash}><a href={"http://cchdo.ucsd.edu" + file.file_path}>{file.file_name}</a></li>
+          <li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>
           )
       }
     });
+
     var raw = files.map(function(file){
       if (file.role === 'raw' && file.data_type === 'hrp'){
       return (
-          <li key={file.file_hash}><a href={"http://cchdo.ucsd.edu" + file.file_path}>{file.file_name}</a></li>
+          <li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>
           )
       }
     });
+
+    var intermediate_files = function(intermediate) {
+      if (intermediate) {
+        return (
+          <div>
+          <h5>Intermediate</h5>
+          <ul>
+            {intermediate}
+          </ul>
+          </div>
+        )
+      }
+    }
+
+    var raw_files = function(raw) {
+      if (raw) {
+        return (
+          <div>
+          <h5>Raw</h5>
+          <ul>
+            {raw}
+          </ul>
+          </div>
+        )
+      }
+    }
+
+    var supplemental_files = function(raw, intermediate) {
+      if (raw || intermediate) {
+        return (
+          <div>
+          <h4>Data As Received</h4>
+          {intermediate_files}
+          {raw_files}
+          </div>
+        )
+      }
+    }
 
     var references;
     if (cruise.hasOwnProperty("references")){
@@ -243,6 +285,7 @@ var CruisePage = React.createClass({
          </Breadcrumb>
 
         <dl className="dl-horizontal">
+        <dt>Expocode</dt><dd>{expocode_link}</dd>
         <dt>Data Owner/PI</dt><dd><ul className="list-unstyled">{hrp_owners}</ul></dd>
         <dt>Chief Scientist(s)</dt><dd><ul className="list-unstyled">{chi_scis}</ul></dd>
         <dt>Dates</dt><dd>{cruise.startDate}/{cruise.endDate}</dd>
@@ -250,9 +293,9 @@ var CruisePage = React.createClass({
         <dt>Port In</dt><dd>{cruise.end_port}</dd>
         <dt>Ship</dt><dd>{cruise.ship}</dd>
         <dt>Institutions</dt><dd><ul className="list-unstyled">{institutions}</ul></dd>
-        <dt>References</dt><dd><ul className="list-unstyled">{references}</ul></dd>
+        <dt>References</dt><dd><ul className="list-unstyled">{references}</ul></dd>        
         </dl>
-        <h4>Dataset</h4>
+        <h4>Microstructure NetCDF Dataset</h4>
         <ul>
           {dataset}
         </ul>
@@ -260,15 +303,11 @@ var CruisePage = React.createClass({
         <ul>
           {reports}
         </ul>
-        <h4>Data As Received</h4>
-        <h5>Intermediate</h5>
-        <ul>
-          {intermediate}
-        </ul>
-        <h5>Raw</h5>
-        <ul>
-          {raw}
-        </ul>
+
+
+        {supplemental_files}
+
+        
         </div>
         )
   }
@@ -370,7 +409,7 @@ class App extends Component {
   render() {
     var expocode = parseHash(window.location.hash);
     return (
-      <Microstructure source="https://cchdo.ucsd.edu/api/v1/pipe/site/microstructure.ucsd.edu" expocode={expocode}/>
+      <Microstructure source={api_url} expocode={expocode}/>
     )
   }
 }
