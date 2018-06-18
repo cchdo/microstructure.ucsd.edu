@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Router, Route, Link } from 'react-router'
+import { Route } from 'react-router'
+import { HashRouter, Link } from 'react-router-dom'
 import {Breadcrumb, Panel, Collapse} from 'react-bootstrap';
 
 import './bootstrap/css/bootstrap.min.css';
@@ -23,15 +24,6 @@ function updateCruiseList(){
     });
   });
 };
-
-function parseHash(hash){
-  var h = hash.split("#/cruise/");
-  if (h.length === 2){
-    return h[1];
-  } else {
-    return NaN;
-  }
-}
 
 function getCruiseByExpocode(expocode, cruises){
   for (var i=0; i < cruises.length; i++){
@@ -129,8 +121,9 @@ var CruisePage = React.createClass({
     if (this.state.cruises.length === 0){
       return <div>Loading...</div>
     }
-    var cruise = getCruiseByExpocode(this.props.params.expocode, this.state.cruises);
-    var files = getCruiseFilesByExpocode(this.props.params.expocode, this.state.cruises);
+    console.log(this.props)
+    var cruise = getCruiseByExpocode(this.props.match.params.expocode, this.state.cruises);
+    var files = getCruiseFilesByExpocode(this.props.match.params.expocode, this.state.cruises);
 
     var expocode_link = <a href={cchdo_url + "/cruise/" + cruise.expocode}>{cruise.expocode}</a>;
     
@@ -244,10 +237,10 @@ var CruisePage = React.createClass({
 
       if (ref.hasOwnProperty("properties")){
         for (const prop in ref.properties){
-          if (prop == "href"){
+          if (prop === "href"){
             href = ref.properties.href;
           }
-          if (prop == "text"){
+          if (prop === "text"){
             text = ref.properties.href;
           }
         }
@@ -255,7 +248,7 @@ var CruisePage = React.createClass({
       if (ref.organization){
         organization = <b>({ref.organization})</b>;
       }
-      if (ref.type == "link" || href){
+      if (ref.type === "link" || href){
         if (href){
           link = href;
         }
@@ -396,10 +389,12 @@ var Microstructure = React.createClass({
     return (
         <div>
         <h3>microstructure.ucsd.edu</h3>
-        <Router>
-          <Route path="/" component={CruiseList} />
+        <HashRouter>
+        <div>
+          <Route exact path="/" component={CruiseList} />
           <Route path="/cruise/:expocode" component={CruisePage} />
-        </Router>
+          </div>
+        </HashRouter>
         </div>
         );
   }
@@ -407,9 +402,8 @@ var Microstructure = React.createClass({
 
 class App extends Component {
   render() {
-    var expocode = parseHash(window.location.hash);
     return (
-      <Microstructure source={api_url} expocode={expocode}/>
+      <Microstructure source={api_url}/>
     )
   }
 }
