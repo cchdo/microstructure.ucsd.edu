@@ -324,16 +324,16 @@ var CruiseList = React.createClass({
 
     var programs = this.state.cruises.map(function (program){
       return (
-        <tr>
-          <td key={program.cruise.expocode}><Link to={`/cruise/${program.cruise.expocode}`}>{program.cruise.sites["microstructure.ucsd.edu"].name}</Link>
+        <tr key={program.cruise.expocode}>
+          <td ><Link to={`/cruise/${program.cruise.expocode}`}>{program.cruise.sites["microstructure.ucsd.edu"].name}</Link>
           </td>
-          <td key={program.cruise.start_port}>
+          <td>
             {program.cruise.start_port}
           </td>            
-          <td key={program.cruise.startDate}>
+          <td>
             {program.cruise.startDate}
           </td>
-          <td key={program.cruise.endDate}>
+          <td>
             {program.cruise.endDate}
           </td>
         </tr>
