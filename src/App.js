@@ -218,8 +218,8 @@ var CruisePage = React.createClass({
         return (
           <div>
           <h4>Data As Received</h4>
-          {intermediate_files}
-          {raw_files}
+          {intermediate_files(intermediate)}
+          {raw_files(raw)}
           </div>
         )
       }
