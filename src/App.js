@@ -298,7 +298,7 @@ var CruisePage = React.createClass({
         </ul>
 
 
-        {supplemental_files}
+        {supplemental_files(raw, intermediate)}
 
         
         </div>
