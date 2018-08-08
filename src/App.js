@@ -188,7 +188,7 @@ var CruisePage = React.createClass({
     });
 
     var intermediate_files = function(intermediate) {
-      if (intermediate) {
+      if (intermediate[0]) {
         return (
           <div>
           <h5>Intermediate</h5>
@@ -201,7 +201,7 @@ var CruisePage = React.createClass({
     }
 
     var raw_files = function(raw) {
-      if (raw) {
+      if (raw[0]) {
         return (
           <div>
           <h5>Raw</h5>
@@ -214,7 +214,7 @@ var CruisePage = React.createClass({
     }
 
     var supplemental_files = function(raw, intermediate) {
-      if (raw || intermediate) {
+      if (raw[0] || intermediate[0]) {
         return (
           <div>
           <h4>Data As Received</h4>
