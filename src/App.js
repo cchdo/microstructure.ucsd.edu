@@ -171,24 +171,25 @@ var CruisePage = React.createClass({
           )
       }
     });
-    var intermediate = files.map(function(file){
+    
+    var intermediate = files.reduce(function(fileList, file) {
       if (file.role === 'intermediate' && file.data_type === 'hrp'){
-      return (
-          <li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>
-          )
-      }
-    });
+        fileList.push(<li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>)
+      } 
+      return fileList
+    }, []);
 
-    var raw = files.map(function(file){
+
+    var raw = files.reduce(function(fileList, file) {
       if (file.role === 'raw' && file.data_type === 'hrp'){
-      return (
-          <li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>
-          )
-      }
-    });
+        fileList.push(<li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>)
+      } 
+      return fileList
+    }, []);
 
+    
     var intermediate_files = function(intermediate) {
-      if (intermediate) {
+      if (intermediate.length > 0) {
         return (
           <div>
           <h5>Intermediate</h5>
@@ -196,12 +197,12 @@ var CruisePage = React.createClass({
             {intermediate}
           </ul>
           </div>
-        )
+        )        
       }
     }
 
     var raw_files = function(raw) {
-      if (raw) {
+      if (raw.length > 0) {
         return (
           <div>
           <h5>Raw</h5>
@@ -209,19 +210,19 @@ var CruisePage = React.createClass({
             {raw}
           </ul>
           </div>
-        )
+        )        
       }
     }
 
     var supplemental_files = function(raw, intermediate) {
-      if (raw || intermediate) {
+      if (raw.length > 0 || intermediate.length > 0) {
         return (
           <div>
           <h4>Data As Received</h4>
           {intermediate_files(intermediate)}
           {raw_files(raw)}
           </div>
-        )
+        )       
       }
     }
 
