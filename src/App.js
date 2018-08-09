@@ -171,7 +171,7 @@ var CruisePage = React.createClass({
           )
       }
     });
-    
+
     var intermediate = files.reduce(function(fileList, file) {
       if (file.role === 'intermediate' && file.data_type === 'hrp'){
         fileList.push(<li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>)
@@ -187,7 +187,6 @@ var CruisePage = React.createClass({
       return fileList
     }, []);
 
-    
     var intermediate_files = function(intermediate) {
       if (intermediate.length > 0) {
         return (
@@ -299,7 +298,7 @@ var CruisePage = React.createClass({
         </ul>
 
 
-        {supplemental_files}
+        {supplemental_files(raw, intermediate)}
 
         
         </div>
