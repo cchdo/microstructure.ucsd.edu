@@ -172,6 +172,13 @@ var CruisePage = React.createClass({
       }
     });
 
+    var unprocessed = files.reduce(function(fileList, file) {
+      if (file.role === 'unprocessed' && file.data_type === 'hrp'){
+        fileList.push(<li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>)
+      }
+      return fileList
+    }, []);
+
     var intermediate = files.reduce(function(fileList, file) {
       if (file.role === 'intermediate' && file.data_type === 'hrp'){
         fileList.push(<li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>)
@@ -186,6 +193,19 @@ var CruisePage = React.createClass({
       } 
       return fileList
     }, []);
+
+    var unprocessed_files = function(unprocessed) {
+      if (unprocessed.length > 0) {
+        return (
+          <div>
+          <h5>Unprocessed</h5>
+          <ul>
+            {unprocessed}
+          </ul>
+          </div>
+        )
+      }
+    }
 
     var intermediate_files = function(intermediate) {
       if (intermediate.length > 0) {
@@ -213,11 +233,12 @@ var CruisePage = React.createClass({
       }
     }
 
-    var supplemental_files = function(raw, intermediate) {
-      if (raw.length > 0 || intermediate.length > 0) {
+    var supplemental_files = function(raw, intermediate, unprocessed) {
+      if (raw.length > 0 || intermediate.length > 0 || unprocessed.length > 0) {
         return (
           <div>
           <h4>Data As Received</h4>
+          {unprocessed_files(unprocessed)}
           {intermediate_files(intermediate)}
           {raw_files(raw)}
           </div>
@@ -298,7 +319,7 @@ var CruisePage = React.createClass({
         </ul>
 
 
-        {supplemental_files(raw, intermediate)}
+        {supplemental_files(raw, intermediate, unprocessed)}
 
         
         </div>
