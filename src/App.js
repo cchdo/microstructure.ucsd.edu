@@ -5,25 +5,9 @@ import {Breadcrumb, Panel, Collapse} from 'react-bootstrap';
 
 import './bootstrap/css/bootstrap.min.css';
 
-const api_url = "https://cchdo.ucsd.edu/api/v1/pipe/site/microstructure.ucsd.edu";
+const api_url = process.env.REACT_APP_API_URL;
 const cchdo_url = "https://cchdo.ucsd.edu";
 
-var cruises = [];
-const cruisesEvent = new Event("cruises");
-
-
-function updateCruiseList(){
-  fetch(api_url).then(function(response){
-    response.json().then(function(json){
-      cruises = json.cruises.sort(function(a, b){
-        var a_sort_value = a.cruise.sites["microstructure.ucsd.edu"].name;
-        var b_sort_value = b.cruise.sites["microstructure.ucsd.edu"].name;
-        return a_sort_value.localeCompare(b_sort_value);
-        });
-      window.dispatchEvent(cruisesEvent);
-    });
-  });
-};
 
 function getCruiseByExpocode(expocode, cruises){
   for (var i=0; i < cruises.length; i++){
@@ -51,11 +35,14 @@ function listOrFiller(jsx_alm_array){
 
 }
 
-var IntroPane = React.createClass({
-  getInitialState: function(){
-    return {open:false}
-  },
-  render: function(){
+//var IntroPane = React.createClass({
+class IntroPane extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {open: false}
+  }
+
+  render(){
     return(
 
       <Panel header={<h3>Welcome to the NSF-funded Microstructure Database</h3>}>
@@ -102,28 +89,16 @@ var IntroPane = React.createClass({
       </Panel>
     )
   }
-})
+}
 
-var CruisePage = React.createClass({
-  cruiseListUpdate: function(e){
-    this.setState({cruises:cruises});
-  },
-  getInitialState: function(){
-    return {cruises:cruises}
-  },
-  componentDidMount: function(){
-    window.addEventListener("cruises", this.cruiseListUpdate);
-  },
-  componentWillUnmount: function(){
-    window.removeEventListener("cruises", this.cruiseListUpdate);
-  },
-  render: function(){
-    if (this.state.cruises.length === 0){
+//var CruisePage = React.createClass({
+class CruisePage extends React.Component {
+  render(){
+    if (this.props.cruises.length === 0){
       return <div>Loading...</div>
     }
-    console.log(this.props)
-    var cruise = getCruiseByExpocode(this.props.match.params.expocode, this.state.cruises);
-    var files = getCruiseFilesByExpocode(this.props.match.params.expocode, this.state.cruises);
+    var cruise = getCruiseByExpocode(this.props.match.params.expocode, this.props.cruises);
+    var files = getCruiseFilesByExpocode(this.props.match.params.expocode, this.props.cruises);
 
     var expocode_link = <a href={cchdo_url + "/cruise/" + cruise.expocode}>{cruise.expocode}</a>;
     
@@ -325,25 +300,14 @@ var CruisePage = React.createClass({
         </div>
         )
   }
-});
+}
 
-var CruiseList = React.createClass({
-  cruiseListUpdate: function(e){
-    this.setState({cruises:cruises});
-  },
-  getInitialState: function(){
-    return {cruises:cruises}
-  },
-  componentDidMount: function(){
-    window.addEventListener("cruises", this.cruiseListUpdate);
-  },
-  componentWillUnmount: function(){
-    window.removeEventListener("cruises", this.cruiseListUpdate);
-  },
-  render: function() {
+//var CruiseList = React.createClass({
+class CruiseList extends React.Component {
+  render() {
     console.log(this.props);
 
-    var programs = this.state.cruises.map(function (program){
+    var programs = this.props.cruises.map(function (program){
       return (
         <tr key={program.cruise.expocode}>
           <td ><Link to={`/cruise/${program.cruise.expocode}`}>{program.cruise.sites["microstructure.ucsd.edu"].name}</Link>
@@ -392,34 +356,43 @@ var CruiseList = React.createClass({
       </div>
     )
   }
-});
+}
 
 
-var Microstructure = React.createClass({
-  getInitialState: function() {
-    return {
-      cruises: []
-    };
-  },
+//var Microstructure = React.createClass({
+class Microstructure extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {cruises: []};
+  }
 
-  componentDidMount: function() {
-    updateCruiseList();
-  },
+  componentDidMount() {
+    fetch(api_url)
+      .then((response) => response.json())
+      .then((json) => {
+        let cruises = json.cruises.sort(function(a, b){
+          var a_sort_value = a.cruise.sites["microstructure.ucsd.edu"].name;
+          var b_sort_value = b.cruise.sites["microstructure.ucsd.edu"].name;
+          return a_sort_value.localeCompare(b_sort_value);
+          });
+        this.setState({cruises: cruises});
+      });
+  }
 
-  render: function(){
+  render(){
     return (
         <div>
         <h3>microstructure.ucsd.edu</h3>
         <HashRouter>
         <div>
-          <Route exact path="/" component={CruiseList} />
-          <Route path="/cruise/:expocode" component={CruisePage} />
+          <Route exact path="/" render={props => <CruiseList {...props} cruises={this.state.cruises}/>} />
+          <Route path="/cruise/:expocode" render={props => <CruisePage {...props} cruises={this.state.cruises}/>} />
           </div>
         </HashRouter>
         </div>
         );
   }
-});
+}
 
 class App extends Component {
   render() {
