@@ -91,6 +91,17 @@ class IntroPane extends React.Component {
   }
 }
 
+class PlaceholderLi extends React.Component {
+  render(){
+    const hasContent = this.props.children && this.props.children.length;
+    if (hasContent){
+      return this.props.children
+    } else {
+      return <li>-</li>
+    }
+  }
+}
+
 //var CruisePage = React.createClass({
 class CruisePage extends React.Component {
   render(){
@@ -102,30 +113,23 @@ class CruisePage extends React.Component {
 
     var expocode_link = <a href={cchdo_url + "/cruise/" + cruise.expocode}>{cruise.expocode}</a>;
     
-    var institutions = [];
-    var hrp_owners= listOrFiller(cruise["participants"].map(function(person){
-      if (person.role === "Microstructure PI"){
-        if (institutions.indexOf(person.institution) === -1){
-          institutions.push(person.institution);
-        }
-        return (
-            <li key={person.name}>{person.name}</li>
-            )
-      }
-    }));
+    let microstructure_pis = cruise["participants"].filter(person => (person.role === "Microstructure PI"));
+    var institutions = new Set(microstructure_pis.map(pi => pi.institution));
+
+    var hrp_owners= listOrFiller(microstructure_pis.map(pi => <li key={pi.name}>{pi.name}</li>));
+
+    
 
     var chi_scis = listOrFiller(cruise["participants"].map(function(person){
       if (person.role === "Chief Scientist"){
-        if (institutions.indexOf(person.institution) === -1){
-          institutions.push(person.institution);
-        }
+        institutions.add(person.institution);
         return (
             <li key={person.name}>{person.name}</li>
             )
       }
     }));
 
-    institutions = listOrFiller(institutions.map(function(inst){
+    institutions = listOrFiller([...institutions].map(function(inst){
       return (
           <li key={inst}>{inst}</li>
           )
