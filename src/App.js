@@ -11,16 +11,6 @@ const cchdo_url = "https://cchdo.ucsd.edu";
 
 const rmd = (string) => <ReactMarkdown source={string.join("/n")} escapeHtml={false} />
 
-function listOrFiller(jsx_alm_array){
-    if (jsx_alm_array.every(function(e){return e===undefined})){
-      jsx_alm_array = (
-          <li>-</li>
-          )
-    }
-    return jsx_alm_array;
-
-}
-
 function IntroPane(){
   const [open, setOpen] = useState(false);
 
@@ -63,13 +53,39 @@ It is part of the Ocean Mixing Community GitHub repository Standard-Mixing-Routi
   )
 }
 
-function PlaceholderLi(props) {
-  const hasContent = props.children && props.children.length;
-  if (hasContent) {
-    return props.children
-  } else {
-    return <li>-</li>
+function FileListItem(props){
+  const file = props.file
+  return (<li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>)
+}
+
+function ConditionalFileList({ header, files }) {
+  if (files.length === 0) {
+    return null
   }
+
+  return (
+    <div>
+      <h5>{header}</h5>
+      <ul>
+        {files}
+      </ul>
+    </div>
+  )
+}
+
+function SuplimentalFiles({raw, intermediate, unprocessed}) {
+  if (raw.length === 0 && intermediate.length === 0 && unprocessed.length === 0) {
+    return null;
+  }
+
+  return (
+    <div>
+    <h4>Data As Received</h4>
+    <ConditionalFileList header="Unprocessed" files={unprocessed} />
+    <ConditionalFileList header="Intermediate" files={intermediate} />
+    <ConditionalFileList header="Raw" files={raw} />
+    </div>
+  )       
 }
 
 function CruisePage(props){
@@ -80,129 +96,39 @@ function CruisePage(props){
     const expocode = props.match.params.expocode;
     const {cruise, files} = props.cruises[expocode]
 
-    var expocode_link = <a href={cchdo_url + "/cruise/" + cruise.expocode}>{cruise.expocode}</a>;
+    const expocode_link = <a href={cchdo_url + "/cruise/" + cruise.expocode}>{cruise.expocode}</a>;
     
-    let microstructure_pis = cruise["participants"].filter(person => (person.role === "Microstructure PI"));
-    var institutions = new Set(microstructure_pis.map(pi => pi.institution));
+    const microstructure_pis = cruise["participants"].filter(person => (person.role === "Microstructure PI"));
+    let institutions = new Set(microstructure_pis.map(pi => pi.institution));
 
-    var hrp_owners= listOrFiller(microstructure_pis.map(pi => <li key={pi.name}>{pi.name}</li>));
+    let hrp_owners= microstructure_pis.map(pi => <li key={pi.name}>{pi.name}</li>);
 
+    const chi_scis = cruise.participants.filter(person => person.role === "Chief Scientist").map(person => {
+      institutions.add(person.institution);
+      return (<li key={person.name}>{person.name}</li>)
+    })
+
+    institutions = [...institutions].map((inst) => <li key={inst}>{inst}</li>);
+    
+    const fileFilter = ({file, role, data_type}) => (file.role === role && file.data_type === data_type)
+
+    const dataset = files.filter((file) => fileFilter({file:file, role:"dataset", data_type:"hrp"})).map((file) => <FileListItem file={file} />)
+    const reports = files.filter((file) => fileFilter({file:file, role:"dataset", data_type:"documentation"})).map((file) => <FileListItem file={file} />)
+
+    const unprocessed = files.filter((file) => fileFilter({file:file, role:"unprocessed", data_type:"hrp"})).map((file) => <FileListItem file={file} />)
+    const intermediate = files.filter((file) => fileFilter({file:file, role:"intermediate", data_type:"hrp"})).map((file) => <FileListItem file={file} />)
+    const raw = files.filter((file) => fileFilter({file:file, role:"raw", data_type:"hrp"})).map((file) => <FileListItem file={file} />)
     
 
-    var chi_scis = listOrFiller(cruise["participants"].map(function(person){
-      if (person.role === "Chief Scientist"){
-        institutions.add(person.institution);
-        return (
-            <li key={person.name}>{person.name}</li>
-            )
-      }
-    }));
-
-    institutions = listOrFiller([...institutions].map(function(inst){
-      return (
-          <li key={inst}>{inst}</li>
-          )
-    }));
-    
-
-    var dataset = files.map(function(file){
-      if (file.role === 'dataset' && file.data_type === 'hrp'){
-      return (
-          <li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>
-          )
-      }
-    });
-    var reports = files.map(function(file){
-      if (file.role === 'dataset' && file.data_type === 'documentation'){
-      return (
-          <li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>
-          )
-      }
-    });
-
-    var unprocessed = files.reduce(function(fileList, file) {
-      if (file.role === 'unprocessed' && file.data_type === 'hrp'){
-        fileList.push(<li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>)
-      }
-      return fileList
-    }, []);
-
-    var intermediate = files.reduce(function(fileList, file) {
-      if (file.role === 'intermediate' && file.data_type === 'hrp'){
-        fileList.push(<li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>)
-      } 
-      return fileList
-    }, []);
-
-
-    var raw = files.reduce(function(fileList, file) {
-      if (file.role === 'raw' && file.data_type === 'hrp'){
-        fileList.push(<li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>)
-      } 
-      return fileList
-    }, []);
-
-    var unprocessed_files = function(unprocessed) {
-      if (unprocessed.length) {
-        return (
-          <div>
-          <h5>Unprocessed</h5>
-          <ul>
-            {unprocessed}
-          </ul>
-          </div>
-        )
-      }
-    }
-
-    var intermediate_files = function(intermediate) {
-      if (intermediate.length) {
-        return (
-          <div>
-          <h5>Intermediate</h5>
-          <ul>
-            {intermediate}
-          </ul>
-          </div>
-        )        
-      }
-    }
-
-    var raw_files = function(raw) {
-      if (raw.length) {
-        return (
-          <div>
-          <h5>Raw</h5>
-          <ul>
-            {raw}
-          </ul>
-          </div>
-        )        
-      }
-    }
-
-    var supplemental_files = function(raw, intermediate, unprocessed) {
-      if (raw.length || intermediate.length || unprocessed.length) {
-        return (
-          <div>
-          <h4>Data As Received</h4>
-          {unprocessed_files(unprocessed)}
-          {intermediate_files(intermediate)}
-          {raw_files(raw)}
-          </div>
-        )       
-      }
-    }
-
-    var references;
+    let references = [];
     if (cruise.hasOwnProperty("references")){
 
-      references = listOrFiller(cruise["references"].map(function(ref){
+      references = cruise["references"].map(function(ref){
 
-      var href, text;
-      var organization;
-      var link = ref.value;
-      var value = ref.value;
+      let href, text;
+      let organization;
+      let link = ref.value;
+      let value = ref.value;
 
       if (ref.hasOwnProperty("properties")){
         for (const prop in ref.properties){
@@ -232,7 +158,7 @@ function CruisePage(props){
           <li>{ref.type}: {organization} {value}</li>
         );
       }
-      }));
+      });
     }
 
     return (
@@ -250,9 +176,9 @@ function CruisePage(props){
         <dt className="col-sm-3 text-md-right">Expocode</dt>
         <dd className="col-sm-9">{expocode_link}</dd>
         <dt className="col-sm-3 text-md-right">Data Owner/PI</dt>
-        <dd className="col-sm-9"><ul className="list-unstyled">{hrp_owners}</ul></dd>
+        <dd className="col-sm-9"><ul className="list-unstyled">{hrp_owners.length > 0 ? hrp_owners: <li>-</li>}</ul></dd>
         <dt className="col-sm-3 text-md-right">Chief Scientist(s)</dt>
-        <dd className="col-sm-9"><ul className="list-unstyled">{chi_scis}</ul></dd>
+        <dd className="col-sm-9"><ul className="list-unstyled">{chi_scis.length > 0 ? chi_scis : <li>-</li>}</ul></dd>
         <dt className="col-sm-3 text-md-right">Dates</dt>
         <dd className="col-sm-9">{cruise.startDate}/{cruise.endDate}</dd>
         <dt className="col-sm-3 text-md-right">Port Out</dt>
@@ -262,9 +188,9 @@ function CruisePage(props){
         <dt className="col-sm-3 text-md-right">Ship</dt>
         <dd className="col-sm-9">{cruise.ship}</dd>
         <dt className="col-sm-3 text-md-right">Institutions</dt>
-        <dd className="col-sm-9"><ul className="list-unstyled">{institutions}</ul></dd>
+        <dd className="col-sm-9"><ul className="list-unstyled">{institutions.length > 0 ? institutions: <li>-</li>}</ul></dd>
         <dt className="col-sm-3 text-md-right">References</dt>
-        <dd className="col-sm-9"><ul className="list-unstyled">{references}</ul></dd>        
+        <dd className="col-sm-9"><ul className="list-unstyled">{references.length > 0 ? references: <li>-</li>}</ul></dd>        
         </dl>
         <h4>Microstructure NetCDF Dataset</h4>
         <ul>
@@ -275,9 +201,7 @@ function CruisePage(props){
           {reports}
         </ul>
 
-
-        {supplemental_files(raw, intermediate, unprocessed)}
-
+        <SuplimentalFiles raw={raw} intermediate={intermediate} unprocessed={unprocessed} />
         
         </div>
         )
@@ -292,7 +216,7 @@ function CruiseList(props){
       return compare_a.localeCompare(compare_b)
     });
 
-    var programs = expocodes.map(function (expocode){
+    let programs = expocodes.map(function (expocode){
       let program =props.cruises[expocode]
       return (
         <tr key={program.cruise.expocode}>
@@ -313,14 +237,6 @@ function CruiseList(props){
 
     return (
       <div>
-        {/*
-         <Breadcrumb>
-           <Breadcrumb.Item active>
-             Programs
-           </Breadcrumb.Item>
-         </Breadcrumb>
-        */}
-
         <IntroPane />
 
         <h2>Microstructure Programs</h2>
