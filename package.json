@@ -4,6 +4,7 @@
   "private": true,
   "proxy": "https://cchdo.ucsd.edu",
   "dependencies": {
+    "bootstrap": "^3.4.1",
     "react": "^16.12.0",
     "react-bootstrap": "^0.32.4",
     "react-dom": "^16.12.0",

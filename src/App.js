@@ -3,7 +3,7 @@ import { Route } from 'react-router'
 import { HashRouter, Link } from 'react-router-dom'
 import {Breadcrumb, Panel, Collapse} from 'react-bootstrap';
 
-import './bootstrap/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.css';
 
 const api_url = process.env.REACT_APP_API_URL;
 const cchdo_url = "https://cchdo.ucsd.edu";
