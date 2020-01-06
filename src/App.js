@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Route } from 'react-router'
 import { HashRouter, Link } from 'react-router-dom'
 import {Breadcrumb, Card, Collapse, Button, Table} from 'react-bootstrap';
+import ReactMarkdown from 'react-markdown/with-html';
 
 import 'bootstrap/dist/css/bootstrap.css';
 
 const api_url = process.env.REACT_APP_API_URL;
 const cchdo_url = "https://cchdo.ucsd.edu";
+
+const rmd = (string) => <ReactMarkdown source={string.join("/n")} escapeHtml={false} />
 
 function listOrFiller(jsx_alm_array){
     if (jsx_alm_array.every(function(e){return e===undefined})){
@@ -32,37 +35,27 @@ function IntroPane(){
 
       <Collapse in={open}>
         <div>
-          <p>
-            Data from microstructure programs have been provided by the data owners (PIs) or has been digitized from historical papers.
-            For the data given from PIs, data has been archived as CF-compliant NETCDF files with 1-m binned data, where possible, saving the variables: time, depth, pressure, temperature, salinity, latitude, longitude as well as the newly designated variables: epsilon (ocean turbulent kinetic energy dissipation rate in W/kg), and when available, chi-t (ocean dissipation rate of thermal variance from microtemperature in degrees C<sup>2</sup>/s), and chi-c (ocean dissipation rate of thermal variance from microconductivity in degrees C<sup>2</sup>/s).
-            Database entries include the program names and program PIs as well cruise information (research ship, ports of entry and exit, cruise dates, and chief scientist).
-            Relevant cruise reports, program related papers and other documents are also contained in the data archive.
-          </p>
-          <p>
-            Data digitized from PEQUOD, PATCHEX, and WESPAC historical documents include mean profiles of dissipation.
-          </p>
+          {rmd`
+Data from microstructure programs have been provided by the data owners (PIs) or has been digitized from historical papers.
+For the data given from PIs, data has been archived as CF-compliant NETCDF files with 1-m binned data, where possible, saving the variables: time, depth, pressure, temperature, salinity, latitude, longitude as well as the newly designated variables: epsilon (ocean turbulent kinetic energy dissipation rate in W/kg), and when available, chi-t (ocean dissipation rate of thermal variance from microtemperature in degrees C<sup>2</sup>/s), and chi-c (ocean dissipation rate of thermal variance from microconductivity in degrees C<sup>2</sup>/s).
+Database entries include the program names and program PIs as well cruise information (research ship, ports of entry and exit, cruise dates, and chief scientist).
+Relevant cruise reports, program related papers and other documents are also contained in the data archive.
 
-          {/* 
-                <p>Database entries have project specific DOIs which should be cited when the data is used in publication.
-                </p>
-                */}
+Data digitized from PEQUOD, PATCHEX, and WESPAC historical documents include mean profiles of dissipation.
 
-          <p>
-            When available, additional supplementary data is provided such as shipboard ADCP and meteorological data.
-            This data has been provided by the data owners (PIs) and has been included in the database as is without further quality checks by CCHDO.
-          </p>
-          <p>
-            Newly obtained microstructure data can be uploaded to the microstructure database by sending 1-m binned data to the CCHDO group at <a href={cchdo_url + "/submit"}>{cchdo_url + "/submit"}</a>.
-          </p>
-          <p>
-            Citation for data sets that had pressure and/or depth cacluated using the GSW Oceanographic Toolbox:  McDougall, T.J. and P.M. Barker, 2011: Getting started with TEOS-10 and the Gibbs Seawater (GSW) Oceanographic Toolbox, 28pp., SCOR/IAPSO WG127, ISBN 978-0-646-55621-5.
-          </p>
+When available, additional supplementary data is provided such as shipboard ADCP and meteorological data.
+This data has been provided by the data owners (PIs) and has been included in the database as is without further quality checks by CCHDO.
 
-          <p>
-            As part of the Climate Process Team on internal wave driven mixing and creation of this microstructure database, a corresponding GitHub repository has been set up as a community supported and maintained set of best practice routines for calculating various mixing related variables. <a href="https://github.com/OceanMixingCommunity/Standard-Mixing-Routines">https://github.com/OceanMixingCommunity/Standard-Mixing-Routines</a>
-          </p>
-          <p>Andy Pickering wrote a python notebook to show how to extract the microstructure database data. This notebook, Examine_mixing_data.ipynb, contains examples of reading and plotting netcdf files in the mixing database with python. It is part of the Ocean Mixing Community GitHub repository Standard-Mixing-Routines. <a href="https://github.com/OceanMixingCommunity/Standard-Mixing-Routines/blob/master/Examine_mixing_data.ipynb">Reading Mixing Database Files with Python</a>
-          </p>
+Newly obtained microstructure data can be uploaded to the microstructure database by sending 1-m binned data to the CCHDO group at https://cchdo.ucsd.edu/submit.
+
+Citation for data sets that had pressure and/or depth cacluated using the GSW Oceanographic Toolbox:  McDougall, T.J. and P.M. Barker, 2011: Getting started with TEOS-10 and the Gibbs Seawater (GSW) Oceanographic Toolbox, 28pp., SCOR/IAPSO WG127, ISBN 978-0-646-55621-5.
+
+As part of the Climate Process Team on internal wave driven mixing and creation of this microstructure database, a corresponding GitHub repository has been set up as a community supported and maintained set of best practice routines for calculating various mixing related variables. https://github.com/OceanMixingCommunity/Standard-Mixing-Routines
+
+Andy Pickering wrote a python notebook to show how to extract the microstructure database data. 
+This notebook, Examine_mixing_data.ipynb, contains examples of reading and plotting netcdf files in the mixing database with python. 
+It is part of the Ocean Mixing Community GitHub repository Standard-Mixing-Routines. [Reading Mixing Database Files with Python](https://github.com/OceanMixingCommunity/Standard-Mixing-Routines/blob/master/Examine_mixing_data.ipynb)
+          `}
         </div>
       </Collapse>
       </Card.Body>
