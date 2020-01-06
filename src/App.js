@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Route } from 'react-router'
 import { HashRouter, Link } from 'react-router-dom'
-import {Breadcrumb, Panel, Collapse} from 'react-bootstrap';
+import {Breadcrumb, Card, Collapse, Button, Table} from 'react-bootstrap';
 
 import 'bootstrap/dist/css/bootstrap.css';
 
@@ -22,10 +22,12 @@ function IntroPane(){
   const [open, setOpen] = useState(false);
 
   return (
-    <Panel header={<h3>Welcome to the NSF-funded Microstructure Database</h3>}>
+    <Card>
+      <Card.Body>
+      <Card.Title>Welcome to the NSF-funded Microstructure Database</Card.Title>
       <p>
         This database provides a compilation of various datasets obtained from ocean microstructure profilers capable of measuring the smallest scales of oceanic turbulence.
-        <a onClick={() => setOpen(!open)}> more >></a>
+        <Button variant="link" onClick={() => setOpen(!open)}> more >></Button>
       </p>
 
       <Collapse in={open}>
@@ -63,7 +65,8 @@ function IntroPane(){
           </p>
         </div>
       </Collapse>
-    </Panel>
+      </Card.Body>
+    </Card>
   )
 }
 
@@ -250,16 +253,25 @@ function CruisePage(props){
           </Breadcrumb.Item>
          </Breadcrumb>
 
-        <dl className="dl-horizontal">
-        <dt>Expocode</dt><dd>{expocode_link}</dd>
-        <dt>Data Owner/PI</dt><dd><ul className="list-unstyled">{hrp_owners}</ul></dd>
-        <dt>Chief Scientist(s)</dt><dd><ul className="list-unstyled">{chi_scis}</ul></dd>
-        <dt>Dates</dt><dd>{cruise.startDate}/{cruise.endDate}</dd>
-        <dt>Port Out</dt><dd>{cruise.start_port}</dd>
-        <dt>Port In</dt><dd>{cruise.end_port}</dd>
-        <dt>Ship</dt><dd>{cruise.ship}</dd>
-        <dt>Institutions</dt><dd><ul className="list-unstyled">{institutions}</ul></dd>
-        <dt>References</dt><dd><ul className="list-unstyled">{references}</ul></dd>        
+        <dl className="row">
+        <dt className="col-sm-3 text-md-right">Expocode</dt>
+        <dd className="col-sm-9">{expocode_link}</dd>
+        <dt className="col-sm-3 text-md-right">Data Owner/PI</dt>
+        <dd className="col-sm-9"><ul className="list-unstyled">{hrp_owners}</ul></dd>
+        <dt className="col-sm-3 text-md-right">Chief Scientist(s)</dt>
+        <dd className="col-sm-9"><ul className="list-unstyled">{chi_scis}</ul></dd>
+        <dt className="col-sm-3 text-md-right">Dates</dt>
+        <dd className="col-sm-9">{cruise.startDate}/{cruise.endDate}</dd>
+        <dt className="col-sm-3 text-md-right">Port Out</dt>
+        <dd className="col-sm-9">{cruise.start_port}</dd>
+        <dt className="col-sm-3 text-md-right">Port In</dt>
+        <dd className="col-sm-9">{cruise.end_port}</dd>
+        <dt className="col-sm-3 text-md-right">Ship</dt>
+        <dd className="col-sm-9">{cruise.ship}</dd>
+        <dt className="col-sm-3 text-md-right">Institutions</dt>
+        <dd className="col-sm-9"><ul className="list-unstyled">{institutions}</ul></dd>
+        <dt className="col-sm-3 text-md-right">References</dt>
+        <dd className="col-sm-9"><ul className="list-unstyled">{references}</ul></dd>        
         </dl>
         <h4>Microstructure NetCDF Dataset</h4>
         <ul>
@@ -320,7 +332,7 @@ function CruiseList(props){
 
         <h2>Microstructure Programs</h2>
 
-        <table className="table table-striped table-hover">
+        <Table striped hover size="sm">
           <thead>
             <tr>
               <th>Program Name</th>
@@ -332,7 +344,7 @@ function CruiseList(props){
           <tbody>
             {programs}
           </tbody>
-        </table>
+        </Table>
 
       </div>
     )
