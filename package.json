@@ -1,6 +1,6 @@
 {
   "name": "microstructure.ucsd.edu",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "proxy": "https://cchdo.ucsd.edu",
   "dependencies": {

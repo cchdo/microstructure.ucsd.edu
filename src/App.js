@@ -53,9 +53,8 @@ It is part of the Ocean Mixing Community GitHub repository Standard-Mixing-Routi
   )
 }
 
-function FileListItem(props){
-  const file = props.file
-  return (<li key={file.file_hash}><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>)
+function FileListItem({file}){
+  return (<li><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>)
 }
 
 function ConditionalFileList({ header, files }) {
@@ -88,6 +87,32 @@ function SuplimentalFiles({raw, intermediate, unprocessed}) {
   )       
 }
 
+function DlRowItem({ dt, dd }) {
+  return (
+    <>
+      <dt className="col-sm-3 text-md-right">{dt}</dt>
+      <dd className="col-sm-9">{dd}</dd>
+    </>
+  )
+}
+
+function UnstyledList({content, fill}){
+  if (fill === undefined){
+    fill = <li key="filler">-</li>
+  }
+  if (content.length === 0){
+    content = fill
+  }
+
+  return (
+    <ul className="list-unstyled">
+      {content}
+    </ul>
+  )
+}
+
+const ConditionalLink = ({href, children}) => href ? <a href={href}>{children}</a> : children;
+
 function CruisePage(props){
     console.log(props)
     if (Object.keys(props.cruises).length === 0){
@@ -96,12 +121,10 @@ function CruisePage(props){
     const expocode = props.match.params.expocode;
     const {cruise, files} = props.cruises[expocode]
 
-    const expocode_link = <a href={cchdo_url + "/cruise/" + cruise.expocode}>{cruise.expocode}</a>;
-    
     const microstructure_pis = cruise["participants"].filter(person => (person.role === "Microstructure PI"));
     let institutions = new Set(microstructure_pis.map(pi => pi.institution));
 
-    let hrp_owners= microstructure_pis.map(pi => <li key={pi.name}>{pi.name}</li>);
+    const hrp_owners= microstructure_pis.map(pi => <li key={pi.name}>{pi.name}</li>);
 
     const chi_scis = cruise.participants.filter(person => person.role === "Chief Scientist").map(person => {
       institutions.add(person.institution);
@@ -112,54 +135,26 @@ function CruisePage(props){
     
     const fileFilter = ({file, role, data_type}) => (file.role === role && file.data_type === data_type)
 
-    const dataset = files.filter((file) => fileFilter({file:file, role:"dataset", data_type:"hrp"})).map((file) => <FileListItem file={file} />)
-    const reports = files.filter((file) => fileFilter({file:file, role:"dataset", data_type:"documentation"})).map((file) => <FileListItem file={file} />)
+    const dataset = files.filter((file) => fileFilter({file:file, role:"dataset", data_type:"hrp"})).map((file) => <FileListItem key={file.file_hash} file={file} />)
+    const reports = files.filter((file) => fileFilter({file:file, role:"dataset", data_type:"documentation"})).map((file) => <FileListItem key={file.file_hash} file={file} />)
 
-    const unprocessed = files.filter((file) => fileFilter({file:file, role:"unprocessed", data_type:"hrp"})).map((file) => <FileListItem file={file} />)
-    const intermediate = files.filter((file) => fileFilter({file:file, role:"intermediate", data_type:"hrp"})).map((file) => <FileListItem file={file} />)
-    const raw = files.filter((file) => fileFilter({file:file, role:"raw", data_type:"hrp"})).map((file) => <FileListItem file={file} />)
+    const unprocessed = files.filter((file) => fileFilter({file:file, role:"unprocessed", data_type:"hrp"})).map((file) => <FileListItem key={file.file_hash} file={file} />)
+    const intermediate = files.filter((file) => fileFilter({file:file, role:"intermediate", data_type:"hrp"})).map((file) => <FileListItem key={file.file_hash} file={file} />)
+    const raw = files.filter((file) => fileFilter({file:file, role:"raw", data_type:"hrp"})).map((file) => <FileListItem key={file.file_hash} file={file} />)
     
 
-    let references = [];
-    if (cruise.hasOwnProperty("references")){
+    let references = cruise.references ?? [];
 
-      references = cruise["references"].map(function(ref){
+    references = references.map((ref) => {
+      let href = ref.properties?.href;
+      const value = ref.properties?.text ? ref.properties?.text : ref.value;
+      const organization = ref.organization && <b>({ref.organization})</b>;
 
-      let href, text;
-      let organization;
-      let link = ref.value;
-      let value = ref.value;
-
-      if (ref.hasOwnProperty("properties")){
-        for (const prop in ref.properties){
-          if (prop === "href"){
-            href = ref.properties.href;
-          }
-          if (prop === "text"){
-            text = ref.properties.href;
-          }
-        }
-      }
-      if (ref.organization){
-        organization = <b>({ref.organization})</b>;
-      }
-      if (ref.type === "link" || href){
-        if (href){
-          link = href;
-        }
-        if (text){
-          value = text;
-        }
-        return (
-          <li>{ref.type}: {organization} <a href={link}>{value}</a></li>
-        )
-      } else {
-        return (
-          <li>{ref.type}: {organization} {value}</li>
-        );
-      }
-      });
-    }
+      href = ref.type === "link" ? ref.value : href;
+      href = ref.type === "doi" ? `https://doi.org/${ref.value}` : href;
+    
+      return <li key={value}>{ref.type}: {organization} <ConditionalLink href={href}>{value}</ConditionalLink></li>
+    });
 
     return (
         <div>
@@ -173,24 +168,15 @@ function CruisePage(props){
          </Breadcrumb>
 
         <dl className="row">
-        <dt className="col-sm-3 text-md-right">Expocode</dt>
-        <dd className="col-sm-9">{expocode_link}</dd>
-        <dt className="col-sm-3 text-md-right">Data Owner/PI</dt>
-        <dd className="col-sm-9"><ul className="list-unstyled">{hrp_owners.length > 0 ? hrp_owners: <li>-</li>}</ul></dd>
-        <dt className="col-sm-3 text-md-right">Chief Scientist(s)</dt>
-        <dd className="col-sm-9"><ul className="list-unstyled">{chi_scis.length > 0 ? chi_scis : <li>-</li>}</ul></dd>
-        <dt className="col-sm-3 text-md-right">Dates</dt>
-        <dd className="col-sm-9">{cruise.startDate}/{cruise.endDate}</dd>
-        <dt className="col-sm-3 text-md-right">Port Out</dt>
-        <dd className="col-sm-9">{cruise.start_port}</dd>
-        <dt className="col-sm-3 text-md-right">Port In</dt>
-        <dd className="col-sm-9">{cruise.end_port}</dd>
-        <dt className="col-sm-3 text-md-right">Ship</dt>
-        <dd className="col-sm-9">{cruise.ship}</dd>
-        <dt className="col-sm-3 text-md-right">Institutions</dt>
-        <dd className="col-sm-9"><ul className="list-unstyled">{institutions.length > 0 ? institutions: <li>-</li>}</ul></dd>
-        <dt className="col-sm-3 text-md-right">References</dt>
-        <dd className="col-sm-9"><ul className="list-unstyled">{references.length > 0 ? references: <li>-</li>}</ul></dd>        
+          <DlRowItem dt="Expocode" dd={<a href={`${cchdo_url}/cruise/${cruise.expocode}`}>{cruise.expocode}</a>} />
+          <DlRowItem dt="Data Owner/PI" dd={<UnstyledList content={hrp_owners} />} />
+          <DlRowItem dt="Chief Scientist(s)" dd={<UnstyledList content={chi_scis} />} />
+          <DlRowItem dt="Dates" dd={`${cruise.startDate}/${cruise.endDate}`} />
+          <DlRowItem dt="Port Out" dd={cruise.start_port} />
+          <DlRowItem dt="Port In" dd={cruise.end_port} />
+          <DlRowItem dt="Ship" dd={cruise.ship} />
+          <DlRowItem dt="Institutions" dd={<UnstyledList content={institutions} />} />
+          <DlRowItem dt="References" dd={<UnstyledList content={references} />} />
         </dl>
         <h4>Microstructure NetCDF Dataset</h4>
         <ul>
@@ -208,16 +194,14 @@ function CruisePage(props){
 }
 
 function CruiseList(props){
-    console.log(props);
-
-    let expocodes = Object.keys(props.cruises).sort((a, b) => {
+    const expocodes = Object.keys(props.cruises).sort((a, b) => {
       const compare_a = props.cruises[a].cruise.sites["microstructure.ucsd.edu"].name;
       const compare_b = props.cruises[b].cruise.sites["microstructure.ucsd.edu"].name;
       return compare_a.localeCompare(compare_b)
     });
 
-    let programs = expocodes.map(function (expocode){
-      let program =props.cruises[expocode]
+    const programs = expocodes.map((expocode) => {
+      const program = props.cruises[expocode]
       return (
         <tr key={program.cruise.expocode}>
           <td ><Link to={`/cruise/${program.cruise.expocode}`}>{program.cruise.sites["microstructure.ucsd.edu"].name}</Link>
