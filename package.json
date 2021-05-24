@@ -4,14 +4,15 @@
   "private": true,
   "proxy": "https://cchdo.ucsd.edu",
   "dependencies": {
-    "bootstrap": "^4.5.0",
-    "react": "^16.13.1",
-    "react-bootstrap": "^1.0.1",
-    "react-dom": "^16.13.1",
-    "react-markdown": "^4.3.1",
+    "bootstrap": "^4.6.0",
+    "react": "^17.0.2",
+    "react-bootstrap": "^1.6.0",
+    "react-dom": "^17.0.2",
+    "react-markdown": "^6.0.2",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "^3.4.1"
+    "react-scripts": "4.0.3",
+    "rehype-raw": "^5.1.0"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -2,14 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Route } from 'react-router'
 import { HashRouter, Link } from 'react-router-dom'
 import {Breadcrumb, Card, Collapse, Button, Table} from 'react-bootstrap';
-import ReactMarkdown from 'react-markdown/with-html';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw'
+
 
 import 'bootstrap/dist/css/bootstrap.css';
 
 const api_url = process.env.REACT_APP_API_URL;
 const cchdo_url = "https://cchdo.ucsd.edu";
 
-const rmd = (string) => <ReactMarkdown source={string.join("/n")} escapeHtml={false} />
+const rmd = (string) => <ReactMarkdown children={string.join("/n")} rehypePlugins={[rehypeRaw]}/>
 
 function IntroPane(){
   const [open, setOpen] = useState(false);
@@ -36,11 +38,11 @@ Data digitized from PEQUOD, PATCHEX, and WESPAC historical documents include mea
 When available, additional supplementary data is provided such as shipboard ADCP and meteorological data.
 This data has been provided by the data owners (PIs) and has been included in the database as is without further quality checks by CCHDO.
 
-Newly obtained microstructure data can be uploaded to the microstructure database by sending 1-m binned data to the CCHDO group at https://cchdo.ucsd.edu/submit.
+Newly obtained microstructure data can be uploaded to the microstructure database by sending 1-m binned data to the CCHDO group at <https://cchdo.ucsd.edu/submit>.
 
 Citation for data sets that had pressure and/or depth cacluated using the GSW Oceanographic Toolbox:  McDougall, T.J. and P.M. Barker, 2011: Getting started with TEOS-10 and the Gibbs Seawater (GSW) Oceanographic Toolbox, 28pp., SCOR/IAPSO WG127, ISBN 978-0-646-55621-5.
 
-As part of the Climate Process Team on internal wave driven mixing and creation of this microstructure database, a corresponding GitHub repository has been set up as a community supported and maintained set of best practice routines for calculating various mixing related variables. https://github.com/OceanMixingCommunity/Standard-Mixing-Routines
+As part of the Climate Process Team on internal wave driven mixing and creation of this microstructure database, a corresponding GitHub repository has been set up as a community supported and maintained set of best practice routines for calculating various mixing related variables. <https://github.com/OceanMixingCommunity/Standard-Mixing-Routines>
 
 Andy Pickering wrote a python notebook to show how to extract the microstructure database data. 
 This notebook, Examine_mixing_data.ipynb, contains examples of reading and plotting netcdf files in the mixing database with python. 
