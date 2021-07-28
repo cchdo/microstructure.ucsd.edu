@@ -22,7 +22,7 @@ function IntroPane(){
       <Card.Title>Welcome to the NSF-funded Microstructure Database</Card.Title>
       <p>
         This database provides a compilation of various datasets obtained from ocean microstructure profilers capable of measuring the smallest scales of oceanic turbulence.
-        <Button variant="link" onClick={() => setOpen(!open)}> more >></Button>
+        <Button variant="link" onClick={() => setOpen(!open)}> more {">>"}</Button>
       </p>
 
       <Collapse in={open}>
@@ -138,6 +138,7 @@ function CruisePage(props){
     const fileFilter = ({file, role, data_type}) => (file.role === role && file.data_type === data_type)
 
     const dataset = files.filter((file) => fileFilter({file:file, role:"dataset", data_type:"hrp"})).map((file) => <FileListItem key={file.file_hash} file={file} />)
+    dataset.push(...files.filter((file) => fileFilter({file:file, role:"ancillary", data_type:"hrp"})).map((file) => <FileListItem key={file.file_hash} file={file} />))
     const reports = files.filter((file) => fileFilter({file:file, role:"dataset", data_type:"documentation"})).map((file) => <FileListItem key={file.file_hash} file={file} />)
 
     const unprocessed = files.filter((file) => fileFilter({file:file, role:"unprocessed", data_type:"hrp"})).map((file) => <FileListItem key={file.file_hash} file={file} />)
