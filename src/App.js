@@ -139,6 +139,7 @@ function CruisePage(props){
 
     const dataset = files.filter((file) => fileFilter({file:file, role:"dataset", data_type:"hrp"})).map((file) => <FileListItem key={file.file_hash} file={file} />)
     dataset.push(...files.filter((file) => fileFilter({file:file, role:"ancillary", data_type:"hrp"})).map((file) => <FileListItem key={file.file_hash} file={file} />))
+    dataset.push(...files.filter((file) => fileFilter({file:file, role:"ancillary", data_type:"chipod"})).map((file) => <FileListItem key={file.file_hash} file={file} />))
     const reports = files.filter((file) => fileFilter({file:file, role:"dataset", data_type:"documentation"})).map((file) => <FileListItem key={file.file_hash} file={file} />)
 
     const unprocessed = files.filter((file) => fileFilter({file:file, role:"unprocessed", data_type:"hrp"})).map((file) => <FileListItem key={file.file_hash} file={file} />)
