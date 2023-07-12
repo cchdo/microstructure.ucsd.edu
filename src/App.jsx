@@ -8,7 +8,7 @@ import rehypeRaw from 'rehype-raw'
 
 import 'bootstrap/dist/css/bootstrap.css';
 
-const api_url = process.env.REACT_APP_API_URL;
+const api_url = import.meta.env.VITE_API_URL;
 const cchdo_url = "https://cchdo.ucsd.edu";
 
 const rmd = (string) => <ReactMarkdown children={string.join("/n")} rehypePlugins={[rehypeRaw]}/>
