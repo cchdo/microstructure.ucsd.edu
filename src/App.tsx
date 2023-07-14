@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Route } from 'react-router'
-import { HashRouter, Link } from 'react-router-dom'
+import { useState, useEffect } from 'react';
+import { Route } from 'react-router';
+import { HashRouter, Link,useParams } from 'react-router-dom';
 import {Breadcrumb, Card, Collapse, Button, Table} from 'react-bootstrap';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw'
@@ -11,7 +11,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 const api_url = import.meta.env.VITE_API_URL;
 const cchdo_url = "https://cchdo.ucsd.edu";
 
-const rmd = (string) => <ReactMarkdown children={string.join("/n")} rehypePlugins={[rehypeRaw]}/>
+const rmd = (string: TemplateStringsArray) => <ReactMarkdown children={string.join("/n")} rehypePlugins={[rehypeRaw]}/>
 
 function IntroPane(){
   const [open, setOpen] = useState(false);
@@ -55,11 +55,16 @@ It is part of the Ocean Mixing Community GitHub repository Standard-Mixing-Routi
   )
 }
 
-function FileListItem({file}){
+function FileListItem({file}:{file:File}){
   return (<li><a href={cchdo_url + file.file_path}>{file.file_name}</a></li>)
 }
 
-function ConditionalFileList({ header, files }) {
+interface ConditionalFileListProps {
+  header: string;
+  files: JSX.Element[];
+}
+
+function ConditionalFileList({ header, files }: ConditionalFileListProps) {
   if (files.length === 0) {
     return null
   }
@@ -74,7 +79,13 @@ function ConditionalFileList({ header, files }) {
   )
 }
 
-function SuplimentalFiles({raw, intermediate, unprocessed}) {
+interface SuplimentalFilesProps {
+  raw: JSX.Element[];
+  intermediate: JSX.Element[];
+  unprocessed: JSX.Element[];
+}
+
+function SuplimentalFiles({raw, intermediate, unprocessed}:SuplimentalFilesProps) {
   if (raw.length === 0 && intermediate.length === 0 && unprocessed.length === 0) {
     return null;
   }
@@ -89,7 +100,12 @@ function SuplimentalFiles({raw, intermediate, unprocessed}) {
   )       
 }
 
-function DlRowItem({ dt, dd }) {
+interface DlRowItemProps {
+  dt: JSX.Element|string;
+  dd: JSX.Element|string;
+}
+
+function DlRowItem({ dt, dd }:DlRowItemProps) {
   return (
     <>
       <dt className="col-sm-3 text-md-right">{dt}</dt>
@@ -98,9 +114,14 @@ function DlRowItem({ dt, dd }) {
   )
 }
 
-function UnstyledList({content, fill}){
+interface UnstyledListProps {
+  content: JSX.Element[];
+  fill?: JSX.Element[];
+}
+
+function UnstyledList({content, fill}:UnstyledListProps){
   if (fill === undefined){
-    fill = <li key="filler">-</li>
+    fill = [<li key="filler">-</li>];
   }
   if (content.length === 0){
     content = fill
@@ -112,19 +133,32 @@ function UnstyledList({content, fill}){
     </ul>
   )
 }
+interface ConditionalLinkProps {
+  href: string;
+  children: JSX.Element
+}
 
-const ConditionalLink = ({href, children}) => href ? <a href={href}>{children}</a> : children;
+const ConditionalLink = ({href, children}:ConditionalLinkProps) => href ? <a href={href}>{children}</a> : children;
 
-function CruisePage(props){
-    console.log(props)
-    if (Object.keys(props.cruises).length === 0){
+interface CruisePageProps {
+  cruises: CruiseMap;
+  loaded: boolean;
+}
+
+interface CruiseRouteParams {
+  expocode: string;
+}
+
+function CruisePage({cruises, loaded}:CruisePageProps){
+    const {expocode} = useParams<CruiseRouteParams>()
+    console.log(cruises, expocode, loaded)
+    if (!loaded){
       return <div>Loading...</div>
     }
-    const expocode = props.match.params.expocode;
-    const {cruise, files} = props.cruises[expocode]
+    const {cruise, files} = cruises.get(expocode)!
 
     const microstructure_pis = cruise["participants"].filter(person => (person.role === "Microstructure PI"));
-    let institutions = new Set(microstructure_pis.map(pi => pi.institution));
+    let institutions = new Set<string>(microstructure_pis.map(pi => pi.institution));
 
     const hrp_owners= microstructure_pis.map(pi => <li key={pi.name}>{pi.name}</li>);
 
@@ -133,9 +167,9 @@ function CruisePage(props){
       return (<li key={person.name}>{person.name}</li>)
     })
 
-    institutions = [...institutions].map((inst) => <li key={inst}>{inst}</li>);
+    const institutionList = [...institutions].map((inst) => <li key={inst}>{inst}</li>);
     
-    const fileFilter = ({file, role, data_type}) => (file.role === role && file.data_type === data_type)
+    const fileFilter = ({file, role, data_type}: {file:File, role:string, data_type:string}) => (file.role === role && file.data_type === data_type)
 
     const dataset = files.filter((file) => fileFilter({file:file, role:"dataset", data_type:"hrp"})).map((file) => <FileListItem key={file.file_hash} file={file} />)
     dataset.push(...files.filter((file) => fileFilter({file:file, role:"ancillary", data_type:"hrp"})).map((file) => <FileListItem key={file.file_hash} file={file} />))
@@ -149,7 +183,7 @@ function CruisePage(props){
 
     let references = cruise.references ?? [];
 
-    references = references.map((ref) => {
+    let referenceList = references.map((ref) => {
       let href = ref.properties?.href;
       const value = ref.properties?.text ? ref.properties?.text : ref.value;
       const organization = ref.organization && <b>({ref.organization})</b>;
@@ -179,8 +213,8 @@ function CruisePage(props){
           <DlRowItem dt="Port Out" dd={cruise.start_port} />
           <DlRowItem dt="Port In" dd={cruise.end_port} />
           <DlRowItem dt="Ship" dd={cruise.ship} />
-          <DlRowItem dt="Institutions" dd={<UnstyledList content={institutions} />} />
-          <DlRowItem dt="References" dd={<UnstyledList content={references} />} />
+          <DlRowItem dt="Institutions" dd={<UnstyledList content={institutionList} />} />
+          <DlRowItem dt="References" dd={<UnstyledList content={referenceList} />} />
         </dl>
         <h4>Microstructure NetCDF Dataset</h4>
         <ul>
@@ -197,27 +231,22 @@ function CruisePage(props){
         )
 }
 
-function CruiseList(props){
-    const expocodes = Object.keys(props.cruises).sort((a, b) => {
-      const compare_a = props.cruises[a].cruise.sites["microstructure.ucsd.edu"].name;
-      const compare_b = props.cruises[b].cruise.sites["microstructure.ucsd.edu"].name;
-      return compare_a.localeCompare(compare_b)
-    });
+function CruiseList({cruises}:{cruises:CruiseMap}){
 
-    const programs = expocodes.map((expocode) => {
-      const program = props.cruises[expocode]
+    const programs = [...cruises.values()].map((siteCruise) => {
+      const cruise = siteCruise.cruise
       return (
-        <tr key={program.cruise.expocode}>
-          <td ><Link to={`/cruise/${program.cruise.expocode}`}>{program.cruise.sites["microstructure.ucsd.edu"].name}</Link>
+        <tr key={cruise.expocode}>
+          <td ><Link to={`/cruise/${cruise.expocode}`}>{cruise.sites["microstructure.ucsd.edu"].name}</Link>
           </td>
           <td>
-            {program.cruise.start_port}
+            {cruise.start_port}
           </td>            
           <td>
-            {program.cruise.startDate}
+            {cruise.startDate}
           </td>
           <td>
-            {program.cruise.endDate}
+            {cruise.endDate}
           </td>
         </tr>
           )
@@ -247,25 +276,74 @@ function CruiseList(props){
     )
 }
 
+interface Cruise {
+  expocode: string;
+  start_port: string;
+  end_port: string;
+  startDate: string;
+  endDate: string;
+  ship: string;
+  participants: [{
+    name: string;
+    email: string;
+    role: string;
+    institution: string;
+  }];
+  sites: {
+    [key: string]: {
+      name: string
+    }
+  }
+  references: [{
+    type:string;
+    organization: string;
+    value: string;
+    properties: {[key:string]:any}
+  }]
+}
 
-function Microstructure() {
-  const [cruises, setCruises] = useState({})
+interface File {
+  file_name: string;
+  file_hash: string;
+  role: string;
+  data_type: string;
+  file_path: string;
+  
+}
+
+interface SiteCruise {
+  cruise: Cruise;
+  files: [File];
+}
+
+type CruiseMap = Map<string, SiteCruise>
+
+function Microstructure({source}:{source:string}) {
+  const [loaded, setLoaded] = useState(false);
+  const [cruises, setCruises] = useState(new Map<string, SiteCruise>())
 
   useEffect(() => {
-    fetch(api_url)
+    fetch(source)
       .then((response) => response.json())
       .then((json) => {
-        setCruises(Object.fromEntries(json.cruises.map((c) => [c.cruise.expocode, c])));
+        const cruises: [[string, SiteCruise]] = json.cruises.map((c:SiteCruise) => [c.cruise.expocode, c]).sort((a:[string, SiteCruise], b:[string, SiteCruise]) => {
+          const compare_a = a[1].cruise.sites["microstructure.ucsd.edu"].name;
+          const compare_b = b[1].cruise.sites["microstructure.ucsd.edu"].name;
+          return compare_a.localeCompare(compare_b)
+        });
+        setCruises(new Map(cruises));
+        setLoaded(true);
       });
   }, [])
+  console.log(cruises)
 
   return (
     <div>
       <h3>microstructure.ucsd.edu</h3>
       <HashRouter>
         <div>
-          <Route exact path="/" render={props => <CruiseList {...props} cruises={cruises} />} />
-          <Route path="/cruise/:expocode" render={props => <CruisePage {...props} cruises={cruises} />} />
+          <Route exact path="/" render={() => <CruiseList cruises={cruises} />} />
+          <Route path="/cruise/:expocode" render={() => <CruisePage cruises={cruises} loaded={loaded}/>} />
         </div>
       </HashRouter>
     </div>
