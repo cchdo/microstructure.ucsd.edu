@@ -166,7 +166,6 @@ interface CruiseRouteParams {
 
 function CruisePage({ cruises, loaded }: CruisePageProps) {
   const { expocode } = useParams<CruiseRouteParams>();
-  console.log(cruises, expocode, loaded);
   if (!loaded) {
     return <div>Loading...</div>;
   }
@@ -416,7 +415,6 @@ function Microstructure({ source }: { source: string }) {
         setLoaded(true);
       });
   }, []);
-  console.log(cruises);
 
   return (
     <div>
