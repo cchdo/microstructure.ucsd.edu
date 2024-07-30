@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Route } from "react-router";
+import { Route, Routes } from "react-router";
 import { HashRouter, Link, useParams } from "react-router-dom";
 import { Breadcrumb, Card, Collapse, Button, Table } from "react-bootstrap";
 import ReactMarkdown from "react-markdown";
@@ -160,7 +160,7 @@ interface CruisePageProps {
   loaded: boolean;
 }
 
-interface CruiseRouteParams {
+type CruiseRouteParams = {
   expocode: string;
 }
 
@@ -169,7 +169,7 @@ function CruisePage({ cruises, loaded }: CruisePageProps) {
   if (!loaded) {
     return <div>Loading...</div>;
   }
-  const { cruise, files } = cruises.get(expocode)!;
+  const { cruise, files } = cruises.get(expocode!)!;
 
   const microstructure_pis = cruise["participants"].filter(
     (person) => person.role === "Microstructure PI"
@@ -270,12 +270,14 @@ function CruisePage({ cruises, loaded }: CruisePageProps) {
 
   return (
     <div>
+      <Card body bg="light">
       <Breadcrumb>
         <Breadcrumb.Item href="#/">Programs</Breadcrumb.Item>
         <Breadcrumb.Item active>
           {cruise.sites["microstructure.ucsd.edu"].name}
         </Breadcrumb.Item>
       </Breadcrumb>
+      </Card>
 
       <dl className="row">
         <DlRowItem
@@ -429,15 +431,16 @@ function Microstructure({ source }: { source: string }) {
       <h3>microstructure.ucsd.edu</h3>
       <HashRouter>
         <div>
+        <Routes>
           <Route
-            exact
             path="/"
-            render={() => <CruiseList cruises={cruises} />}
+            element={<CruiseList cruises={cruises} />}
           />
           <Route
             path="/cruise/:expocode"
-            render={() => <CruisePage cruises={cruises} loaded={loaded} />}
+            element={<CruisePage cruises={cruises} loaded={loaded} />}
           />
+          </Routes>
         </div>
       </HashRouter>
     </div>
