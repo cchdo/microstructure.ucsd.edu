@@ -242,6 +242,14 @@ function CruisePage({ cruises, loaded }: CruisePageProps) {
     .filter((file) => fileFilter({ file: file, role: "raw", data_type: "hrp" }))
     .map((file) => <FileListItem key={file.file_hash} file={file} />);
 
+  raw.push(
+    ...files
+      .filter((file) =>
+        fileFilter({ file: file, role: "raw", data_type: "chipod" })
+      )
+      .map((file) => <FileListItem key={file.file_hash} file={file} />)
+  );
+
   let references = cruise.references ?? [];
 
   let referenceList = references.map((ref) => {
