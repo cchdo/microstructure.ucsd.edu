@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, JSX } from "react";
 import { Route, Routes } from "react-router";
 import { HashRouter, Link, useParams } from "react-router-dom";
 import { Breadcrumb, Card, Collapse, Button, Table } from "react-bootstrap";
